@@ -19,16 +19,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 
-
-# Páginas de erros customizadas
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
-
-@app.errorhandler(500)
-def page_not_found(e):
-    return render_template('500.html'), 500
-
+# DEFINIÇÃO DO BANCO DE DADOS COM ORM
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
@@ -46,12 +37,25 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username
-    
 
+#FORMULÁRIO
 class NameForm(FlaskForm):
     name = StringField('Whats is your name?', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
+# INTEGRAÇÃO DO BANCO COM PYTHON SHELL
+@app.shell_context_processor
+def make_shell_context():
+    return dict(db=db, User=User, Role=Role)
+
+# PÁGINAS DE ERROS CUSTOMIZADOS
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def page_not_found(e):
+    return render_template('500.html'), 500
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
