@@ -1,6 +1,6 @@
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from itsdangerous import Timed
+# from itsdangerous import Timed
 from flask_login import UserMixin
 from . import login_manager
 
@@ -35,8 +35,8 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
 
-    def generate_confirmation_token(self, expiration=3600)
-        s = 
+    # def generate_confirmation_token(self, expiration=3600)
+        # s = 
     def __repr__(self):
         return '<User %r>' % self.username
     
