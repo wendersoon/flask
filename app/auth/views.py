@@ -2,7 +2,7 @@ from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from . import auth
 from ..models import User, db
-from .forms import LoginForm, RegistrationForm
+from .forms import LoginForm, RegistrationForm, UpdatePassword
 from ..email import send_email
 
 
@@ -14,6 +14,21 @@ def before_request():
             and request.endpoint != 'static':
             
         return redirect(url_for('auth.unconfirmed'))
+    
+@auth.route('/update', methods=['GET', 'POST'])
+@login_required
+def update_password():
+    form = UpdatePassword()
+    if form.validate_on_submit():
+        if current_user.verify_password(form.password.data):
+            user = User.query.filter_by(email=current_user.email).first()
+            user.password = form.new_password.data
+            db.session.commit()
+            return redirect(url_for('main.index'))
+        else:
+            flash('The old password entered is wrong')
+    return render_template('auth/update_password.html', form=form)
+    
     
 
 @auth.route('/login', methods=['GET', 'POST'])
