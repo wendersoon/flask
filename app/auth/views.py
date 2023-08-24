@@ -37,6 +37,7 @@ def register():
                     password=form.password.data)
         db.session.add(user)
         db.session.commit()
+        print('oi')
         token = user.generate_confirmation_token()
         send_email(user.email, 'Confirm Your Account',
                    'auth/email/confirm', user=user, token=token)
@@ -60,12 +61,22 @@ def confirm(token):
 def before_request():
     if current_user.is_authenticated \
             and not current_user.confirmed \
-            and request.bluenprint != 'auth'\
+            and request.blueprint != 'auth'\
             and request.endpoint != 'static':
+            
         return redirect(url_for('auth.unconfirmed'))
     
 @auth.route('/unconfirmed')
 def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
         return redirect(url_for('main.index'))
-    return render_template('auth/unconfirmed.html')
+    return render_template('auth/unconfirmed.html', username=current_user.username)
+
+@auth.route('/confirm')
+@login_required
+def resend_confirmation():
+    token = current_user.generate_confirmation_token()
+    send_email(current_user.email, 'Confirm Your Account',
+               'auth/email/confirm', user=current_user, token=token)
+    flash('A new confirmation email has been sent to you by email.')
+    return redirect(url_for('main.index'))
