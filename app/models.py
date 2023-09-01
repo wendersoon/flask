@@ -74,6 +74,7 @@ class User(UserMixin, db.Model):
     confirmed = db.Column(db.Boolean, default=False)
 
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.role is None:
