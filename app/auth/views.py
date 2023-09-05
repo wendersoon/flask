@@ -6,7 +6,6 @@ from .forms import LoginForm, RegistrationForm, UpdatePassword,\
     PasswordResetForm, PasswordResetRequestForm, ChangeEmailForm
 from ..email import send_email
 
-
 @auth.before_app_request
 def before_request():
     if current_user.is_authenticated \
