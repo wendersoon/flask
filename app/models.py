@@ -116,14 +116,17 @@ class User(UserMixin, db.Model):
     
     def confirm(self, token):
         s = Serializer(current_app.config['SECRET_KEY'])
+        print(token)
         try:
+            print('oi')
             data = s.loads(token)
         except:
             return False
 
         if data.get('confirm') != self.id:
             return False
-        self.confirm = True
+        print('oi')
+        self.confirmed = True
         db.session.add(self)
         return True
     
