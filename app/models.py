@@ -70,7 +70,13 @@ class Role(db.Model):
             db.session.add(role)
         db.session.commit()
 
-    
+class Follow(db.Model):
+    __tablename__ = 'follows'
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'), 
+                            primary_key=True)
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'), 
+                            primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)    
     
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -90,6 +96,13 @@ class User(UserMixin, db.Model):
     
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+    followed = db.relationship('Follow', foreign_keys=[Follow.follower_id], backref=db.backref('follower', lazy='joined'),
+                                lazy='dynamic', cascade='all, delete-orphan')
+    followers = db.relationship('Follow',
+                                foreign_keys=[Follow.followed_id],
+                                backref=db.backref('followed', lazy='joined'),
+                                lazy='dynamic',
+                                cascade='all, delete-orphan')   
     
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -107,8 +120,7 @@ class User(UserMixin, db.Model):
 
         db.session.add(self)
         db.session.commit()
-        
-           
+          
     @property
     def password(self):
         raise AttributeError('password is not a readable attribute')
